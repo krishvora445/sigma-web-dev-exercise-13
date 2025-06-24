@@ -1,26 +1,14 @@
-// --- HELPER FUNCTIONS ---
+// --- HELPER FUNCTIONS (Your original functions are perfect, no changes here) ---
 
-/**
- * Function to format view counts into a more readable format (e.g., 1.2M, 560K).
- */
 function formatViews(num) {
-    if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + 'M';
-    }
-    if (num >= 1000) {
-        return Math.round(num / 1000) + 'K';
-    }
+    if (num >= 1000000) { return (num / 1000000).toFixed(1) + 'M'; }
+    if (num >= 1000) { return Math.round(num / 1000) + 'K'; }
     return num;
 }
 
-/**
- * Formats a string of numbers into a time format (MM:SS or H:MM:SS).
- */
 function formatDuration(inputString) {
     if (!inputString) return "0:00";
-    if (inputString.includes(':')) {
-        return inputString;
-    }
+    if (inputString.includes(':')) { return inputString; }
     const digitsOnly = inputString.replace(/\D/g, '');
     if (digitsOnly.length === 0) return "0:00";
     const paddedDigits = digitsOnly.padStart(2, '0');
@@ -31,28 +19,18 @@ function formatDuration(inputString) {
         const minutes = minutesRaw.padStart(2, '0');
         return `${hoursRaw}:${minutes}:${seconds}`;
     }
-    if (minutesRaw) {
-        return `${minutesRaw}:${seconds}`;
-    }
+    if (minutesRaw) { return `${minutesRaw}:${seconds}`; }
     return `0:${seconds}`;
 }
 
-/**
- * Formats the age of the video into years and months.
- * Handles negative numbers for our easter egg.
- */
 function formatAge(totalMonths) {
     if (totalMonths < 0) {
         const futureMonths = Math.abs(totalMonths);
         const yearText = futureMonths === 1 ? 'month' : 'months';
         return `Uploading in ${futureMonths} ${yearText}`;
     }
-    if (totalMonths === 0) {
-        return "This month";
-    }
-    if (totalMonths < 12) {
-        return `${totalMonths} ${totalMonths === 1 ? 'month' : 'months'} old`;
-    }
+    if (totalMonths === 0) { return "This month"; }
+    if (totalMonths < 12) { return `${totalMonths} ${totalMonths === 1 ? 'month' : 'months'} old`; }
     const years = Math.floor(totalMonths / 12);
     const remainingMonths = totalMonths % 12;
     const yearText = `${years} ${years === 1 ? 'year' : 'years'}`;
@@ -64,10 +42,8 @@ function formatAge(totalMonths) {
     }
 }
 
-
 /**
- * Creates a complete video card HTML element from a data object.
- * UPDATED to include the easter egg logic.
+ * Creates a complete video card HTML element. (Your function is great, no changes needed).
  */
 function createVideoCard(videoData) {
     const card = document.createElement('div');
@@ -133,19 +109,37 @@ const durationInput = document.getElementById('duration');
 videoForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(videoForm);
+    
+    // --- NEW: Input Validation ---
+    const title = formData.get('title');
+    const channelName = formData.get('channelName');
+    const views = formData.get('views');
+    const monthsOld = formData.get('monthsOld');
+    const duration = formData.get('duration');
+    const thumbnailUrl = formData.get('thumbnailUrl');
+    
+    // Check if any field is empty
+    if (!title || !channelName || !views || !monthsOld || !duration || !thumbnailUrl) {
+        alert("Please fill out all fields before creating a card.");
+        return; // Stop the function if validation fails
+    }
+    
+    // --- END NEW ---
+
     const newVideoData = {
-        title: formData.get('title'),
-        channelName: formData.get('channelName'),
-        views: parseInt(formData.get('views')),
-        monthsOld: parseInt(formData.get('monthsOld')),
-        duration: formatDuration(formData.get('duration')),
-        thumbnailUrl: formData.get('thumbnailUrl')
+        title,
+        channelName,
+        views: parseInt(views),
+        monthsOld: parseInt(monthsOld),
+        duration: formatDuration(duration),
+        thumbnailUrl
     };
     const newCard = createVideoCard(newVideoData);
-    cardContainer.prepend(newCard);
-    videoForm.reset();
+    cardContainer.prepend(newCard); // prepend adds the new card to the top
+    videoForm.reset(); // Clear the form fields
 });
 
+// Auto-formats the duration when the user clicks away
 durationInput.addEventListener('blur', () => {
     durationInput.value = formatDuration(durationInput.value);
 });
